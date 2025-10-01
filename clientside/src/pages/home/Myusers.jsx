@@ -2,7 +2,7 @@ import React from "react";
 
 const Myusers = () => {
   return (
-    <div className="flex items-center gap-2 p-2">
+    <div className="flex items-center gap-2 p-2 hover:bg-base-300 hover:cursor-pointer">
       <div className="avatar avatar-online">
         <div className="w-12 rounded-full">
           <img src="https://img.daisyui.com/images/profile/demo/gordon@192.webp" />
