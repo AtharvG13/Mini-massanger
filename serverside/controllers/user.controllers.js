@@ -2,7 +2,8 @@ import express, { response } from "express";
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import errorHandler from "../middleware/errors.js";
-import { errorMiddleware } from "../middleware/errors.js";
+import jwt from "jsonwebtoken";
+import { sendToken } from "../utilities/sendToken.js";
 import catchAsyncError from "../middleware/catchAsyncError.js";
 
 export const registerUser = catchAsyncError(async (req, res, next) => {
@@ -19,18 +20,18 @@ export const registerUser = catchAsyncError(async (req, res, next) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const avatarType = gender === "male" ? "7" : "98";
+    const avatar = `https://avatar.iran.liara.run/public/${avatarType}?username=${username}`;
+
     const user = await User.create({
       fullname,
       username,
       password: hashedPassword,
       gender,
+      avatar,
     });
 
-    res.status(201).json({
-      success: true,
-      message: "User registered successfully",
-      responseData: { user },
-    });
+    sendToken(user, 201, "User registered successfully", res);
   } catch (error) {
     next(error);
   }
@@ -47,14 +48,25 @@ export const loginUser = catchAsyncError(async (req, res, next) => {
     const user = await User.findOne({ username });
 
     if (!user) {
-      return next(new errorHandler("User not found", 404));
+      return next(new errorHandler("User not found!!!", 404));
     }
 
-    if (user.password !== password) {
-      return next(new errorHandler("Invalid password", 401));
+    const userIsValid = await bcrypt.compare(password, user.password);
+    if (!userIsValid) {
+      return next(new errorHandler("Enter valid username or password", 400));
     }
 
-    res.status(200).json({ status: true, message: "Login successful" });
+    sendToken(user, 200, "User logged in successfully", res);
+  } catch (error) {
+    next(error);
+  }
+});
+
+export const getUser = catchAsyncError(async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const profile = await User.findById(userId);
+    res.status(200).json({ success: true, responseData: profile });
   } catch (error) {
     next(error);
   }
