@@ -2,9 +2,11 @@ import express from "express";
 import dotenv from "dotenv";
 dotenv.config({ path: "./config.env" });
 import router from "./routes/user.routes.js";
+import messageRouter from "./routes/message.routes.js";
 import connection from "./dbconnection.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import { errorMiddleware } from "./middleware/errors.js";
 
 const app = express();
 
@@ -23,6 +25,10 @@ app.use(cookieParser());
 connection();
 
 app.use("/api/v1/user", router);
+
+app.use("/api/v1/message", messageRouter);
+
+app.use(errorMiddleware);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT}`);

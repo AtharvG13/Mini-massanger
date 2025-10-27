@@ -1,8 +1,6 @@
-import express, { response } from "express";
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import errorHandler from "../middleware/errors.js";
-import jwt from "jsonwebtoken";
 import { sendToken } from "../utilities/sendToken.js";
 import catchAsyncError from "../middleware/catchAsyncError.js";
 
@@ -63,11 +61,23 @@ export const loginUser = catchAsyncError(async (req, res, next) => {
 });
 
 export const getUser = catchAsyncError(async (req, res, next) => {
-  try {
-    const userId = req.user._id;
-    const profile = await User.findById(userId);
-    res.status(200).json({ success: true, responseData: profile });
-  } catch (error) {
-    next(error);
-  }
+  const userId = req.user._id;
+  const profile = await User.findById(userId);
+  res.status(200).json({ success: true, responseData: profile });
+});
+
+export const logoutUser = catchAsyncError(async (req, res, next) => {
+  res.cookie("authToken", null, {
+    expires: new Date(Date.now()),
+    httpOnly: true,
+  });
+  res.status(200).json({
+    success: true,
+    message: "Logout successfully",
+  });
+});
+
+export const getOthersProfile = catchAsyncError(async (req, res, next) => {
+  const otherUserId = await User.find({ _id: { $ne: req.user._id } });
+  res.status(200).json({ success: true, responseData: otherUserId });
 });

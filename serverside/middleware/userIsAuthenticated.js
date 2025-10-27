@@ -4,19 +4,15 @@ import errorHandler from "./errors.js";
 import catchAsyncError from "./catchAsyncError.js";
 
 export const IsAuthenticated = catchAsyncError(async (req, res, next) => {
-  try {
-    const token = req.cookies.authToken;
+  const token =
+    req.cookies.authToken ||
+    req.header[`authorization`]?.replace("Bearer ", "");
 
-    if (!token) {
-      return next(
-        new errorHandler("Please login to access this resource", 401)
-      );
-    }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    req.user = await User.findById(decoded?._id);
-    next();
-  } catch (error) {
-    next(error);
+  if (!token) {
+    return next(new errorHandler("Please login to access this resource", 401));
   }
+
+  const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+  req.user = decoded;
+  next();
 });
