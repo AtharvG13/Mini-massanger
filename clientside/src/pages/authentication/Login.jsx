@@ -1,13 +1,25 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { FaUserTie } from "react-icons/fa";
 import { RiLockPasswordFill } from "react-icons/ri";
+
+import { useDispatch, useSelector } from "react-redux";
+import { loginUserThunk } from "../../store/slice/User/user.Thunk";
 const Login = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { isAuthenticated } = useSelector((state) => state.userReducer);
   const [login, setLogin] = useState({
     username: "",
     password: "",
   });
-  const handleLogin = (e) => {
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/home");
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleInputChange = (e) => {
     e.preventDefault();
 
     setLogin((prev) => ({
@@ -16,8 +28,12 @@ const Login = () => {
     }));
   };
 
-  console.log(login);
-
+  const handleLogin = async () => {
+    const response = await dispatch(loginUserThunk(login));
+    if (response?.payload?.success) {
+      navigate("/home");
+    }
+  };
   return (
     <div className="flex items-center h-screen justify-center   p-10">
       <div className="  max-w-md w-full flex flex-col gap-6 bg-base-200 p-10 rounded-lg">
@@ -30,7 +46,7 @@ const Login = () => {
             name="username"
             className="grow"
             placeholder="Enter  Username"
-            onChange={handleLogin}
+            onChange={handleInputChange}
           />
         </label>
         <label className="input input-bordered flex items-center  w-full">
@@ -40,10 +56,12 @@ const Login = () => {
             type="text"
             className="grow"
             placeholder="Enter Your Password"
-            onChange={handleLogin}
+            onChange={handleInputChange}
           />
         </label>
-        <button className="btn  btn-success mt-5">Login</button>
+        <button className="btn  btn-success mt-5" onClick={handleLogin}>
+          Login
+        </button>
         <p>
           Don't have an account?
           <Link to={"/signup"} className="text-success underline">

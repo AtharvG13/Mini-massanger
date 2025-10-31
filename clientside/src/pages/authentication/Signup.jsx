@@ -2,12 +2,14 @@ import React from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaUserTie } from "react-icons/fa";
+import { FaUserPen } from "react-icons/fa6";
 import { RiLockPasswordFill } from "react-icons/ri";
 const Signup = () => {
   const [signup, setSignup] = useState({
+    fullname: "",
     username: "",
     password: "",
-    confirmPassword: "",
+    gender: "",
   });
   const handleSignup = (e) => {
     e.preventDefault();
@@ -27,6 +29,17 @@ const Signup = () => {
         </h2>
 
         <label className="input input-bordered flex items-center  w-full">
+          <FaUserPen />
+          <input
+            type="text"
+            name="fullname"
+            className="grow"
+            placeholder="Enter Your Fullname"
+            onChange={handleSignup}
+          />
+        </label>
+
+        <label className="input input-bordered flex items-center  w-full">
           <FaUserTie />
           <input
             type="text"
@@ -36,26 +49,56 @@ const Signup = () => {
             onChange={handleSignup}
           />
         </label>
+
         <label className="input input-bordered flex items-center  w-full">
           <RiLockPasswordFill />
           <input
             name="password"
-            type="text"
+            type="password"
             className="grow"
             placeholder="Enter Your Password"
             onChange={handleSignup}
           />
         </label>
-        <label className="input input-bordered flex items-center  w-full">
-          <RiLockPasswordFill />
-          <input
-            type="text"
-            name="confirmPassword"
-            className="grow"
-            placeholder="Confirm Password"
-            onChange={handleSignup}
-          />
+
+        <label className="text-[#8CA3A3] font-semibold ml-2">
+          Select Gender
+          <div className="flex items-center gap-2 justify-evenly p-2">
+            <label className="">
+              <input
+                type="radio"
+                name="gender"
+                value="male"
+                className="radio radio-xs radio-success mr-2"
+                onChange={handleSignup}
+              />
+              male
+            </label>
+
+            <label className="">
+              <input
+                type="radio"
+                name="gender"
+                value="female"
+                className="radio radio-xs radio-success mr-2"
+                onChange={handleSignup}
+              />
+              female
+            </label>
+
+            <label className="">
+              <input
+                type="radio"
+                name="gender"
+                value="others"
+                className="radio radio-xs radio-success mr-2"
+                onChange={handleSignup}
+              />
+              others
+            </label>
+          </div>
         </label>
+
         <button className="btn  btn-success mt-5">Signup</button>
         <p>
           Already have an account?
