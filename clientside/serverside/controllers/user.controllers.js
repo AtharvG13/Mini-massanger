@@ -61,19 +61,9 @@ export const loginUser = catchAsyncError(async (req, res, next) => {
 });
 
 export const getUser = catchAsyncError(async (req, res, next) => {
-  if (!req.user || !req.user._id) {
-    return res.status(401).json({ success: false, message: "Unauthorized" });
-  }
-
   const userId = req.user._id;
   const profile = await User.findById(userId);
-
-  if (!profile) {
-    return res.status(404).json({ success: false, message: "User not found" });
-  }
-
-  const { password, ...safeProfile } = profile.toObject();
-  res.status(200).json({ success: true, responseData: safeProfile });
+  res.status(200).json({ success: true, responseData: profile });
 });
 
 export const logoutUser = catchAsyncError(async (req, res, next) => {

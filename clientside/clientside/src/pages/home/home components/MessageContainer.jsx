@@ -1,24 +1,19 @@
 import React from "react";
 import { IoSend } from "react-icons/io5";
 import UserMessages from "./UserMessages.jsx";
-import { useSelector } from "react-redux";
 
 const MessageContainer = () => {
-  const { selectedUser } = useSelector((state) => state.userReducer);
-
   return (
     <div className="hidden w-full  max-w-[75%]  md:flex h-screen  flex-col">
       {/* Header */}
       <div className="w-full bg-base-200 flex flex-row p-2 border-b border-white/10 gap-5 rounded-lg">
         <div className="avatar avatar-online ml-2">
           <div className="w-12 rounded-full">
-            <img src={selectedUser?.avatar} />
+            <img src="https://img.daisyui.com/images/profile/demo/gordon@192.webp" />
           </div>
         </div>
         <div className="p-2">
-          <h2 className="text-white text-lg font-bold">
-            {selectedUser?.username}
-          </h2>
+          <h2 className="text-white text-lg font-bold">fullname</h2>
         </div>
       </div>
 

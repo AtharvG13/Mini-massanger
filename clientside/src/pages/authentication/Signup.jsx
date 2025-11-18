@@ -1,17 +1,28 @@
 import React from "react";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { FaUserTie } from "react-icons/fa";
 import { FaUserPen } from "react-icons/fa6";
-import { RiLockPasswordFill } from "react-icons/ri";
+import { FaKey } from "react-icons/fa6";
+import { useDispatch, useSelector } from "react-redux";
+import { signupUserThunk } from "../../store/slice/User/user.Thunk";
 const Signup = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { isAuthenticated } = useSelector((state) => state.userReducer);
+
   const [signup, setSignup] = useState({
     fullname: "",
     username: "",
     password: "",
     gender: "",
   });
-  const handleSignup = (e) => {
+
+  useEffect(() => {
+    if (isAuthenticated) navigate("/home");
+  }, [isAuthenticated, navigate]);
+
+  const handleInputChange = (e) => {
     e.preventDefault();
 
     setSignup((prev) => ({
@@ -20,7 +31,12 @@ const Signup = () => {
     }));
   };
 
-  console.log(signup);
+  const handleSignup = async () => {
+    const response = await dispatch(signupUserThunk(signup));
+    if (response?.payload?.success) {
+      navigate("/login");
+    }
+  };
   return (
     <div className="flex items-center h-screen justify-center   p-10">
       <div className="  max-w-md w-full flex flex-col gap-6 bg-base-200 p-10 rounded-lg">
@@ -35,7 +51,7 @@ const Signup = () => {
             name="fullname"
             className="grow"
             placeholder="Enter Your Fullname"
-            onChange={handleSignup}
+            onChange={handleInputChange}
           />
         </label>
 
@@ -46,60 +62,62 @@ const Signup = () => {
             name="username"
             className="grow"
             placeholder="Enter Username"
-            onChange={handleSignup}
+            onChange={handleInputChange}
           />
         </label>
 
         <label className="input input-bordered flex items-center  w-full">
-          <RiLockPasswordFill />
+          <FaKey />
           <input
             name="password"
             type="password"
             className="grow"
             placeholder="Enter Your Password"
-            onChange={handleSignup}
+            onChange={handleInputChange}
           />
         </label>
 
-        <label className="text-[#8CA3A3] font-semibold ml-2">
+        <div className="text-[#8CA3A3] font-semibold ml-2">
           Select Gender
           <div className="flex items-center gap-2 justify-evenly p-2">
-            <label className="">
+            <label className="flex items-center cursor-pointer">
               <input
                 type="radio"
                 name="gender"
                 value="male"
                 className="radio radio-xs radio-success mr-2"
-                onChange={handleSignup}
+                onChange={handleInputChange}
               />
               male
             </label>
 
-            <label className="">
+            <label className="flex items-center cursor-pointer">
               <input
                 type="radio"
                 name="gender"
                 value="female"
                 className="radio radio-xs radio-success mr-2"
-                onChange={handleSignup}
+                onChange={handleInputChange}
               />
               female
             </label>
 
-            <label className="">
+            <label className="flex items-center cursor-pointer">
               <input
                 type="radio"
                 name="gender"
                 value="others"
                 className="radio radio-xs radio-success mr-2"
-                onChange={handleSignup}
+                onChange={handleInputChange}
               />
               others
             </label>
           </div>
-        </label>
+        </div>
 
-        <button className="btn  btn-success mt-5">Signup</button>
+        <button className="btn  btn-success mt-5" onClick={handleSignup}>
+          Signup
+        </button>
         <p>
           Already have an account?
           <Link to={"/login"} className="text-success underline">
