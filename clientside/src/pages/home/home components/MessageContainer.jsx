@@ -1,44 +1,55 @@
-import React from "react";
-import { IoSend } from "react-icons/io5";
+import React, { useEffect } from "react";
 import UserMessages from "./UserMessages.jsx";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { getMessageThunk } from "../../../store/slice/Message/message.Thunk";
+import SendMessage from "./SendMessage.jsx";
 
 const MessageContainer = () => {
+  const dispatch = useDispatch();
   const { selectedUser } = useSelector((state) => state.userReducer);
+  const { messages } = useSelector((state) => state.messageReducer);
+
+  useEffect(() => {
+    if (selectedUser) {
+      dispatch(getMessageThunk({ receiverId: selectedUser._id }));
+    }
+  }, [selectedUser, dispatch]);
+
+  if (!selectedUser) return null;
 
   return (
-    <div className="hidden w-full  max-w-[75%]  md:flex h-screen  flex-col">
+    <div className="w-full h-screen flex flex-col md:max-w-[90%] mx-auto">
       {/* Header */}
-      <div className="w-full bg-base-200 flex flex-row p-2 border-b border-white/10 gap-5 rounded-lg">
-        <div className="avatar avatar-online ml-2">
-          <div className="w-12 rounded-full">
-            <img src={selectedUser?.avatar} />
+      <div className="w-full bg-base-200 flex items-center gap-3 p-2 border-b border-white/10 rounded-lg justify-center md:justify-start">
+        <div className="avatar avatar-online">
+          <div className="w-10 md:w-12 rounded-full ring-2 ring-secondary ring-offset-base-100 ring-offset-2">
+            <img
+              src={selectedUser?.avatar}
+              alt="User avatar"
+              className="object-cover"
+            />
           </div>
         </div>
-        <div className="p-2">
-          <h2 className="text-white text-lg font-bold">
+        <div>
+          <h2 className="text-white text-base md:text-lg font-bold text-center md:text-left">
             {selectedUser?.username}
           </h2>
         </div>
       </div>
 
       {/* Scrollable message area */}
-      <div className="flex-1 overflow-y-auto py-2 px-2">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <UserMessages key={i} />
+      <div className="flex-1 overflow-y-auto py-2 px-2 md:px-4 space-y-2">
+        {messages?.map((messageDetails) => (
+          <UserMessages
+            key={messageDetails?._id}
+            messageDetails={messageDetails}
+          />
         ))}
       </div>
 
       {/* Sticky input section */}
-      <div className="sticky bottom-0 bg-base-300 h-[6rem] flex items-center p-1 rounded-lg z-10">
-        <input
-          type="text"
-          placeholder="Type here..."
-          className="input input-success input-bordered w-full"
-        />
-        <div className="text-2xl p-2 px-10 ml-2 border-2 border-[#00D390] hover:cursor-pointer hover:bg-[#00D390] rounded-lg">
-          <IoSend />
-        </div>
+      <div className="sticky bottom-0 bg-base-300 flex items-center p-2 md:p-4 rounded-t-lg z-10">
+        <SendMessage />
       </div>
     </div>
   );

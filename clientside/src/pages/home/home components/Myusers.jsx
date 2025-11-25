@@ -14,12 +14,12 @@ const Myusers = ({ userDetails }) => {
   return (
     <div
       onClick={handleOnUserClick}
-      className={`flex items-center gap-2 p-2 hover:bg-base-300 hover:cursor-pointer rounded-lg ${
-        userDetails?._id === selectedUser?._id && "bg-base-300"
+      className={`flex items-center gap-4 p-2 hover:bg-gray-700 hover:cursor-pointer border-2 border-black rounded-lg  ${
+        userDetails?._id === selectedUser?._id && "bg-gray-700"
       }`}
     >
       <div className="avatar avatar-online">
-        <div className="w-12 rounded-full">
+        <div className="w-12 rounded-full ring-primary ring-offset-base-100  ring-2 ring-offset-2">
           <img src={userDetails?.avatar} />
         </div>
       </div>

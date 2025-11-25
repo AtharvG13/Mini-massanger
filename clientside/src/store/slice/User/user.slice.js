@@ -14,7 +14,7 @@ const initialState = {
   userProfile: null,
   buttonLoading: false,
   error: null,
-  selectedUser: null,
+  selectedUser: JSON.parse(localStorage.getItem("selectedUser")),
 };
 
 export const userSlice = createSlice({
@@ -22,6 +22,7 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     setSelectedUser(state, action) {
+      localStorage.setItem("selectedUser", JSON.stringify(action.payload));
       state.selectedUser = action.payload;
     },
   },
@@ -31,13 +32,6 @@ export const userSlice = createSlice({
       state.buttonLoading = true;
     });
     builder.addCase(loginUserThunk.fulfilled, (state, action) => {
-      console.log("LOGIN FULFILLED - Full payload:", action.payload);
-      console.log("LOGIN FULFILLED - User:", action.payload?.user);
-      console.log(
-        "LOGIN FULFILLED - Setting userProfile to:",
-        action.payload?.user
-      );
-
       state.buttonLoading = false;
       state.screenLoading = false;
       state.isAuthenticated = true;
@@ -45,16 +39,7 @@ export const userSlice = createSlice({
 
       if (action.payload?.token) {
         localStorage.setItem("authToken", action.payload.token);
-        console.log(
-          "Token stored:",
-          action.payload.token.substring(0, 20) + "..."
-        );
       }
-
-      console.log("State after login:", {
-        isAuthenticated: state.isAuthenticated,
-        hasUserProfile: !!state.userProfile,
-      });
     });
     builder.addCase(loginUserThunk.rejected, (state) => {
       state.buttonLoading = false;
@@ -93,6 +78,7 @@ export const userSlice = createSlice({
       state.buttonLoading = false;
       state.screenLoading = false;
       localStorage.removeItem("authToken");
+      localStorage.clear();
     });
 
     builder.addCase(logoutUserThunk.rejected, (state) => {

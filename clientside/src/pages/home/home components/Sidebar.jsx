@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 const Sidebar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { otherUsers } = useSelector((state) => state.userReducer);
+  const { otherUsers, userProfile } = useSelector((state) => state.userReducer);
   const [showLogout, setShowLogout] = useState(true);
   const scrollRef = useRef(null);
   const lastScrollY = useRef(0);
@@ -41,7 +41,7 @@ const Sidebar = () => {
   }, []);
 
   return (
-    <div className="w-full max-w-full md:max-w-[22%] flex flex-col h-screen bg-base-200 relative overflow-hidden">
+    <div className="h-screen flex flex-col bg-base-200 relative overflow-hidden">
       {/* Sticky Header + Search */}
       <div className="sticky top-0 z-10 bg-base-200">
         <div className="flex justify-center items-center p-1">
@@ -50,7 +50,7 @@ const Sidebar = () => {
           </h1>
         </div>
         <div className="p-3">
-          <label className="input rounded-2xl flex items-center gap-2 w-[90%] max-w-md mx-auto">
+          <label className="input rounded-2xl flex items-center gap-4 w-[90%] max-w-md mx-auto">
             <input
               type="search"
               required
@@ -71,17 +71,21 @@ const Sidebar = () => {
 
       {/* Animated Logout section (responsive) */}
       <div
-        className={`absolute bottom-0 left-0 w-full bg-base-300 h-[3rem] flex items-center justify-between p-4 transition-all duration-300 z-20 ${
+        className={`absolute bottom-0 left-0 w-full bg-base-300 h-[5rem] flex items-center justify-between p-4 transition-all duration-300 z-20 ${
           showLogout
             ? "translate-y-0 opacity-100"
             : "translate-y-full opacity-0"
         }`}
       >
-        <div className="avatar">
-          <div className="ring-primary ring-offset-base-100 w-10 rounded-full ring-2 ring-offset-2">
-            <img src="https://img.daisyui.com/images/profile/demo/spiderperson@192.webp" />
+        <div className="avatar flex flex-row align-items-center  space-x-5">
+          <div className="ring-success ring-offset-base-100 w-11 rounded-full ring-2 ring-offset-2">
+            <img src={userProfile?.avatar} />
           </div>
+          <h2 className="text-white text-base md:text-lg font-bold text-center md:text-left py-2">
+            {userProfile?.username}
+          </h2>
         </div>
+
         <button
           className="btn btn-outline btn-success btn-sm py-3"
           onClick={handleLogout}
