@@ -1,55 +1,44 @@
-import { IoSend } from "react-icons/io5";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { sendMessageThunk } from "../../../store/slice/Message/message.Thunk";
+import { sendMessageThunk } from "../../../store/slice/Message/message.thunk";
+import { IoSend } from "react-icons/io5";
 
 const SendMessage = () => {
+  const [message, setMessage] = useState("");
   const dispatch = useDispatch();
   const { selectedUser } = useSelector((state) => state.userReducer);
-  const [Message, setMessage] = useState("");
 
-  const handleMessage = (e) => {
+  const handleSend = async (e) => {
     e.preventDefault();
-    dispatch(
+    if (!message.trim()) return;
+
+    await dispatch(
       sendMessageThunk({
-        receiverId: selectedUser?._id,
-        message: Message,
+        receiverId: selectedUser._id,
+        message: message.trim(),
       })
     );
+
     setMessage("");
   };
 
   return (
-    <form
-      onSubmit={handleMessage}
-      className="w-full flex flex-row items-center gap-2 px-2 md:px-4"
-    >
-      {/* Input Field */}
+    <form onSubmit={handleSend} className="flex gap-2 w-full">
       <input
         type="text"
-        placeholder="Type your message..."
-        className="input input-success input-bordered flex-1 text-sm md:text-base"
-        value={Message}
+        value={message}
         onChange={(e) => setMessage(e.target.value)}
+        placeholder="Type a message..."
+        className="input input-success input-bordered flex-1"
       />
-
-      {/* Send Button */}
       <button
         type="submit"
-        disabled={!Message.trim()}
-        className={`text-2xl border-2 border-[#00D390] rounded-lg
-                    p-2 w-10 h-10 flex items-center justify-center
-                    md:px-6 md:py-2 md:w-auto md:h-auto
-                    ${
-                      !Message.trim()
-                        ? "opacity-50 cursor-not-allowed"
-                        : "hover:cursor-pointer hover:bg-[#00D390]"
-                    }`}
+        disabled={!message.trim()}
+        className="btn btn-success"
       >
-        <IoSend />
+        Send
       </button>
     </form>
   );
 };
-
 export default SendMessage;

@@ -3,19 +3,33 @@ import { useSelector, useDispatch } from "react-redux";
 import MessageContainer from "./home components/MessageContainer.jsx";
 import Sidebar from "./home components/Sidebar.jsx";
 import { getOtherUsersThunk } from "../../store/slice/User/user.Thunk";
+import {
+  initializeSocket,
+  getSocket,
+} from "../../store/slice/Socket/socket.slice.js";
+import { setSelectedUser } from "../../store/slice/User/user.slice.js";
 
 const Home = () => {
   const dispatch = useDispatch();
-  const { screenLoading, selectedUser } = useSelector(
-    (state) => state.userReducer
-  );
+
+  const { screenLoading, selectedUser, isAuthenticated, userProfile } =
+    useSelector((state) => state.userReducer);
+
+  const { onlineUsers } = useSelector((state) => state.socketReducer);
 
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
+  /* ------------ INITIALIZE SOCKET ONCE ------------ */
+  useEffect(() => {
+    if (!isAuthenticated || !userProfile?._id) return;
+
+    dispatch(initializeSocket(String(userProfile._id)));
+  }, [isAuthenticated, userProfile?._id, dispatch]);
+
+  /* ------------ FETCH USERS & RESIZE ------------ */
   useEffect(() => {
     dispatch(getOtherUsersThunk());
 
-    // Track screen resizing (live mobile/desktop switch)
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", handleResize);
 
@@ -24,55 +38,48 @@ const Home = () => {
 
   if (screenLoading) return null;
 
-  /* ---------- MOBILE VIEW LOGIC ---------- */
+  const isSelectedUserOnline = selectedUser
+    ? onlineUsers.includes(String(selectedUser._id))
+    : false;
+
+  /* ================= MOBILE ================= */
   if (isMobile) {
     return (
       <div className="w-full h-screen bg-base-300 overflow-hidden">
-        {/* If no user selected → show Sidebar */}
-        {!selectedUser && (
-          <div className="w-full h-full">
-            <Sidebar />
-          </div>
-        )}
+        {!selectedUser && <Sidebar />}
 
-        {/* If a user is selected → show MessageContainer fullscreen */}
         {selectedUser && (
           <div className="relative w-full h-full">
-            {/* BACK BUTTON */}
             <button
-              onClick={() => window.location.reload()}
-              className="absolute top-3 left-3 z-50 bg-gray-700 text-white px-3 py-1 rounded-lg shadow"
+              onClick={() => dispatch(setSelectedUser(null))}
+              className="absolute top-3 left-3 z-50 bg-gray-700 text-white px-3 py-1 rounded-lg"
             >
               ← Back
             </button>
 
-            <MessageContainer />
+            <MessageContainer
+              isOnline={isSelectedUserOnline}
+              socket={getSocket()}
+            />
           </div>
         )}
       </div>
     );
   }
 
-  /* ---------- DESKTOP VIEW (Same as your existing working layout) ---------- */
+  /* ================= DESKTOP ================= */
   return (
     <div className="flex w-full h-screen bg-base-300 overflow-hidden">
-      <div
-        className={`${
-          selectedUser
-            ? "w-full md:w-[23%]"
-            : "w-full flex items-center justify-center"
-        } h-screen`}
-      >
-        <div
-          className={selectedUser ? "" : "w-[60%] bg-gray-600 rounded-2xl p-3"}
-        >
-          <Sidebar />
-        </div>
+      <div className={`${selectedUser ? "w-[23%]" : "w-full"} h-screen`}>
+        <Sidebar />
       </div>
 
       {selectedUser && (
         <div className="hidden md:flex w-[77%] h-screen">
-          <MessageContainer />
+          <MessageContainer
+            isOnline={isSelectedUserOnline}
+            socket={getSocket()}
+          />
         </div>
       )}
     </div>

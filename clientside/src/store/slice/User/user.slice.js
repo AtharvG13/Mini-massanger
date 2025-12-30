@@ -77,8 +77,9 @@ export const userSlice = createSlice({
       state.isAuthenticated = false;
       state.buttonLoading = false;
       state.screenLoading = false;
+
       localStorage.removeItem("authToken");
-      localStorage.clear();
+      localStorage.removeItem("selectedUser");
     });
 
     builder.addCase(logoutUserThunk.rejected, (state) => {
